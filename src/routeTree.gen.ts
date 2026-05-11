@@ -9,10 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsIdRouteImport } from './routes/projects.$id'
 import { Route as ProjectsIdIndexRouteImport } from './routes/projects.$id.index'
+import { Route as ProjectsIdScopeRouteImport } from './routes/projects.$id.scope'
+import { Route as ProjectsIdOrchestrationRouteImport } from './routes/projects.$id.orchestration'
+import { Route as ProjectsIdEvaluationRouteImport } from './routes/projects.$id.evaluation'
+import { Route as ProjectsIdArtifactsRouteImport } from './routes/projects.$id.artifacts'
 
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -28,37 +38,104 @@ const ProjectsIdIndexRoute = ProjectsIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProjectsIdRoute,
 } as any)
+const ProjectsIdScopeRoute = ProjectsIdScopeRouteImport.update({
+  id: '/scope',
+  path: '/scope',
+  getParentRoute: () => ProjectsIdRoute,
+} as any)
+const ProjectsIdOrchestrationRoute = ProjectsIdOrchestrationRouteImport.update({
+  id: '/orchestration',
+  path: '/orchestration',
+  getParentRoute: () => ProjectsIdRoute,
+} as any)
+const ProjectsIdEvaluationRoute = ProjectsIdEvaluationRouteImport.update({
+  id: '/evaluation',
+  path: '/evaluation',
+  getParentRoute: () => ProjectsIdRoute,
+} as any)
+const ProjectsIdArtifactsRoute = ProjectsIdArtifactsRouteImport.update({
+  id: '/artifacts',
+  path: '/artifacts',
+  getParentRoute: () => ProjectsIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/templates': typeof TemplatesRoute
   '/projects/$id': typeof ProjectsIdRouteWithChildren
+  '/projects/$id/artifacts': typeof ProjectsIdArtifactsRoute
+  '/projects/$id/evaluation': typeof ProjectsIdEvaluationRoute
+  '/projects/$id/orchestration': typeof ProjectsIdOrchestrationRoute
+  '/projects/$id/scope': typeof ProjectsIdScopeRoute
   '/projects/$id/': typeof ProjectsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/templates': typeof TemplatesRoute
+  '/projects/$id/artifacts': typeof ProjectsIdArtifactsRoute
+  '/projects/$id/evaluation': typeof ProjectsIdEvaluationRoute
+  '/projects/$id/orchestration': typeof ProjectsIdOrchestrationRoute
+  '/projects/$id/scope': typeof ProjectsIdScopeRoute
   '/projects/$id': typeof ProjectsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/templates': typeof TemplatesRoute
   '/projects/$id': typeof ProjectsIdRouteWithChildren
+  '/projects/$id/artifacts': typeof ProjectsIdArtifactsRoute
+  '/projects/$id/evaluation': typeof ProjectsIdEvaluationRoute
+  '/projects/$id/orchestration': typeof ProjectsIdOrchestrationRoute
+  '/projects/$id/scope': typeof ProjectsIdScopeRoute
   '/projects/$id/': typeof ProjectsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/projects/$id' | '/projects/$id/'
+  fullPaths:
+    | '/'
+    | '/templates'
+    | '/projects/$id'
+    | '/projects/$id/artifacts'
+    | '/projects/$id/evaluation'
+    | '/projects/$id/orchestration'
+    | '/projects/$id/scope'
+    | '/projects/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/projects/$id'
-  id: '__root__' | '/' | '/projects/$id' | '/projects/$id/'
+  to:
+    | '/'
+    | '/templates'
+    | '/projects/$id/artifacts'
+    | '/projects/$id/evaluation'
+    | '/projects/$id/orchestration'
+    | '/projects/$id/scope'
+    | '/projects/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/templates'
+    | '/projects/$id'
+    | '/projects/$id/artifacts'
+    | '/projects/$id/evaluation'
+    | '/projects/$id/orchestration'
+    | '/projects/$id/scope'
+    | '/projects/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  TemplatesRoute: typeof TemplatesRoute
   ProjectsIdRoute: typeof ProjectsIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -80,14 +157,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsIdIndexRouteImport
       parentRoute: typeof ProjectsIdRoute
     }
+    '/projects/$id/scope': {
+      id: '/projects/$id/scope'
+      path: '/scope'
+      fullPath: '/projects/$id/scope'
+      preLoaderRoute: typeof ProjectsIdScopeRouteImport
+      parentRoute: typeof ProjectsIdRoute
+    }
+    '/projects/$id/orchestration': {
+      id: '/projects/$id/orchestration'
+      path: '/orchestration'
+      fullPath: '/projects/$id/orchestration'
+      preLoaderRoute: typeof ProjectsIdOrchestrationRouteImport
+      parentRoute: typeof ProjectsIdRoute
+    }
+    '/projects/$id/evaluation': {
+      id: '/projects/$id/evaluation'
+      path: '/evaluation'
+      fullPath: '/projects/$id/evaluation'
+      preLoaderRoute: typeof ProjectsIdEvaluationRouteImport
+      parentRoute: typeof ProjectsIdRoute
+    }
+    '/projects/$id/artifacts': {
+      id: '/projects/$id/artifacts'
+      path: '/artifacts'
+      fullPath: '/projects/$id/artifacts'
+      preLoaderRoute: typeof ProjectsIdArtifactsRouteImport
+      parentRoute: typeof ProjectsIdRoute
+    }
   }
 }
 
 interface ProjectsIdRouteChildren {
+  ProjectsIdArtifactsRoute: typeof ProjectsIdArtifactsRoute
+  ProjectsIdEvaluationRoute: typeof ProjectsIdEvaluationRoute
+  ProjectsIdOrchestrationRoute: typeof ProjectsIdOrchestrationRoute
+  ProjectsIdScopeRoute: typeof ProjectsIdScopeRoute
   ProjectsIdIndexRoute: typeof ProjectsIdIndexRoute
 }
 
 const ProjectsIdRouteChildren: ProjectsIdRouteChildren = {
+  ProjectsIdArtifactsRoute: ProjectsIdArtifactsRoute,
+  ProjectsIdEvaluationRoute: ProjectsIdEvaluationRoute,
+  ProjectsIdOrchestrationRoute: ProjectsIdOrchestrationRoute,
+  ProjectsIdScopeRoute: ProjectsIdScopeRoute,
   ProjectsIdIndexRoute: ProjectsIdIndexRoute,
 }
 
@@ -97,6 +210,7 @@ const ProjectsIdRouteWithChildren = ProjectsIdRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  TemplatesRoute: TemplatesRoute,
   ProjectsIdRoute: ProjectsIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
