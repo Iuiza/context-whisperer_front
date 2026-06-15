@@ -1,13 +1,15 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ARTIFACT_META, type ArtifactType } from "@/lib/types";
 
-const ORDER: ArtifactType[] = ["REQUIREMENTS", "ARCHITECTURE", "UML", "AGENTS_MD"];
+const ORDER: ArtifactType[] = [
+  "REQUIREMENTS",
+  "USER_STORIES",
+  "DOMAIN_MODEL",
+  "ARCHITECTURE_DOC",
+  "UML_DIAGRAM",
+  "API_SPEC",
+];
 
 export function ArtifactToolbar({
   value,
@@ -21,9 +23,7 @@ export function ArtifactToolbar({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-foreground">
-          Artefatos a produzir
-        </label>
+        <label className="text-sm font-medium text-foreground">Artefatos a produzir</label>
         <span className="text-xs text-muted-foreground">
           {value.length} selecionado{value.length === 1 ? "" : "s"}
         </span>

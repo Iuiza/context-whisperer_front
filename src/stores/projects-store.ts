@@ -1,17 +1,12 @@
 import { create } from "zustand";
 import { mockProjects, newProjectScopeMd } from "@/lib/mock-data";
-import type {
-  Artifact,
-  ArtifactType,
-  Project,
-  ProjectStatus,
-  ScopeStatus,
-} from "@/lib/types";
+import type { Artifact, ArtifactType, Project, ProjectStatus, ScopeStatus } from "@/lib/types";
 
 interface CreateProjectInput {
   name: string;
   prompt: string;
   selectedArtifacts: ArtifactType[];
+  id?: string;
 }
 
 interface ProjectsState {
@@ -26,21 +21,27 @@ interface ProjectsState {
 const SAMPLE_DRAFT_REQ = `# Requisitos\n\n## RF\n- RF01 ...\n- RF02 ...\n\n## RNF\n- RNF01 ...\n`;
 const SAMPLE_DRAFT_ARCH = `# Arquitetura\n\n## Camadas\n- Apresentação\n- Aplicação\n- Domínio\n- Infra\n`;
 const SAMPLE_DRAFT_UML = "# UML\n\n```mermaid\nclassDiagram\n  class Entidade\n```\n";
-const SAMPLE_DRAFT_AGENTS = "# agents.md\n\n- AgenteA\n- AgenteB\n";
+const SAMPLE_DRAFT_USER_STORIES = "# User Stories\n\n- Como usuário, quero...\n";
+const SAMPLE_DRAFT_DOMAIN = "# Modelo de domínio\n\n- Entidade\n- Valor\n";
+const SAMPLE_DRAFT_API = "# API Spec\n\n## GET /health\n";
 
 const draftFor = (type: ArtifactType) =>
   type === "REQUIREMENTS"
     ? SAMPLE_DRAFT_REQ
-    : type === "ARCHITECTURE"
+    : type === "ARCHITECTURE_DOC"
       ? SAMPLE_DRAFT_ARCH
-      : type === "UML"
+      : type === "UML_DIAGRAM"
         ? SAMPLE_DRAFT_UML
-        : SAMPLE_DRAFT_AGENTS;
+        : type === "USER_STORIES"
+          ? SAMPLE_DRAFT_USER_STORIES
+          : type === "DOMAIN_MODEL"
+            ? SAMPLE_DRAFT_DOMAIN
+            : SAMPLE_DRAFT_API;
 
 export const useProjectsStore = create<ProjectsState>((set, get) => ({
   projects: mockProjects,
-  createProject: ({ name, prompt, selectedArtifacts }) => {
-    const id = `proj-${Date.now()}`;
+  createProject: ({ id: providedId, name, prompt, selectedArtifacts }) => {
+    const id = providedId ?? `proj-${Date.now()}`;
     const project: Project = {
       id,
       name,
@@ -65,11 +66,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
               ...p,
               scope: { ...p.scope, status, feedback },
               status:
-                status === "APPROVED"
-                  ? "GENERATING"
-                  : status === "REJECTED"
-                    ? "FAILED"
-                    : p.status,
+                status === "APPROVED" ? "GENERATING" : status === "REJECTED" ? "FAILED" : p.status,
               artifacts:
                 status === "APPROVED" && p.artifacts.length === 0
                   ? p.selectedArtifacts.map<Artifact>((t) => ({

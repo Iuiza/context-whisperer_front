@@ -1,15 +1,12 @@
-import type {
-  ArtifactType,
-  Constraint,
-  Project,
-  Template,
-} from "./types";
+import type { ArtifactType, Constraint, Project, Template } from "./types";
 
 const ALL_ARTIFACTS: ArtifactType[] = [
   "REQUIREMENTS",
-  "ARCHITECTURE",
-  "UML",
-  "AGENTS_MD",
+  "USER_STORIES",
+  "DOMAIN_MODEL",
+  "ARCHITECTURE_DOC",
+  "UML_DIAGRAM",
+  "API_SPEC",
 ];
 
 const SAMPLE_REQUIREMENTS_MD = `# Requisitos
@@ -51,10 +48,24 @@ classDiagram
 \`\`\`
 `;
 
-const SAMPLE_AGENTS_MD = `# agents.md
+const SAMPLE_USER_STORIES_MD = `# User Stories
 
-- **OrderAgent**: orquestra pedidos, escuta eventos do gateway.
-- **DeliveryAgent**: associa entregadores e calcula ETA.
+- Como cliente, quero acompanhar meu pedido em tempo real.
+- Como restaurante, quero receber pedidos pagos por PIX.
+`;
+
+const SAMPLE_DOMAIN_MODEL_MD = `# Modelo de domínio
+
+- Cliente
+- Restaurante
+- Pedido
+- Entregador
+`;
+
+const SAMPLE_API_SPEC_MD = `# API Spec
+
+## POST /orders
+Cria um pedido com itens, endereço e forma de pagamento.
 `;
 
 const SCOPE_MD = `## In-Scope
@@ -82,15 +93,32 @@ export const mockProjects: Project[] = [
     selectedArtifacts: ALL_ARTIFACTS,
     scope: { status: "APPROVED", contentMd: SCOPE_MD },
     artifacts: [
-      { type: "REQUIREMENTS", status: "APPROVED", iterationCount: 2, content: SAMPLE_REQUIREMENTS_MD },
-      { type: "ARCHITECTURE", status: "APPROVED", iterationCount: 1, content: SAMPLE_ARCH_MD },
-      { type: "UML", status: "APPROVED", iterationCount: 3, content: SAMPLE_UML_MD },
-      { type: "AGENTS_MD", status: "APPROVED", iterationCount: 1, content: SAMPLE_AGENTS_MD },
+      {
+        type: "REQUIREMENTS",
+        status: "APPROVED",
+        iterationCount: 2,
+        content: SAMPLE_REQUIREMENTS_MD,
+      },
+      {
+        type: "USER_STORIES",
+        status: "APPROVED",
+        iterationCount: 1,
+        content: SAMPLE_USER_STORIES_MD,
+      },
+      {
+        type: "DOMAIN_MODEL",
+        status: "APPROVED",
+        iterationCount: 1,
+        content: SAMPLE_DOMAIN_MODEL_MD,
+      },
+      { type: "ARCHITECTURE_DOC", status: "APPROVED", iterationCount: 1, content: SAMPLE_ARCH_MD },
+      { type: "UML_DIAGRAM", status: "APPROVED", iterationCount: 3, content: SAMPLE_UML_MD },
+      { type: "API_SPEC", status: "APPROVED", iterationCount: 1, content: SAMPLE_API_SPEC_MD },
     ],
     evaluations: [
       {
         id: "ev-1",
-        artifactType: "ARCHITECTURE",
+        artifactType: "ARCHITECTURE_DOC",
         iteration: 1,
         constraintCategory: "ARQUITETURA_LIMPA",
         constraintRule: "Domínio não pode importar Infra",
@@ -104,7 +132,7 @@ export const mockProjects: Project[] = [
       },
       {
         id: "ev-2",
-        artifactType: "ARCHITECTURE",
+        artifactType: "ARCHITECTURE_DOC",
         iteration: 2,
         constraintCategory: "ARQUITETURA_LIMPA",
         constraintRule: "Domínio não pode importar Infra",
@@ -124,12 +152,17 @@ export const mockProjects: Project[] = [
     prompt:
       "SaaS para clínicas pequenas gerenciarem agenda de consultas com lembretes por WhatsApp.",
     status: "GENERATING",
-    selectedArtifacts: ["REQUIREMENTS", "ARCHITECTURE", "UML"],
+    selectedArtifacts: ["REQUIREMENTS", "ARCHITECTURE_DOC", "UML_DIAGRAM"],
     scope: { status: "APPROVED", contentMd: SCOPE_MD },
     artifacts: [
-      { type: "REQUIREMENTS", status: "APPROVED", iterationCount: 1, content: SAMPLE_REQUIREMENTS_MD },
-      { type: "ARCHITECTURE", status: "RUNNING", iterationCount: 2, content: "" },
-      { type: "UML", status: "IDLE", iterationCount: 0, content: "" },
+      {
+        type: "REQUIREMENTS",
+        status: "APPROVED",
+        iterationCount: 1,
+        content: SAMPLE_REQUIREMENTS_MD,
+      },
+      { type: "ARCHITECTURE_DOC", status: "RUNNING", iterationCount: 2, content: "" },
+      { type: "UML_DIAGRAM", status: "IDLE", iterationCount: 0, content: "" },
     ],
     evaluations: [],
     createdAt: "2026-05-11T09:12:00Z",
@@ -148,10 +181,25 @@ export const mockProjects: Project[] = [
 ];
 
 export const mockTemplates: Template[] = [
-  { id: "t1", name: "Requisitos padrão", targetDocument: "1_Requisitos.md", contentMd: "# Requisitos\n## RF\n## RNF" },
-  { id: "t2", name: "Arquitetura limpa", targetDocument: "2_Arquitetura.md", contentMd: "# Arquitetura\n## Camadas" },
-  { id: "t3", name: "UML Mermaid", targetDocument: "3_UML.md", contentMd: "# UML\n```mermaid\n```" },
-  { id: "t4", name: "agents.md base", targetDocument: "agents.md", contentMd: "# agents.md" },
+  {
+    id: "t1",
+    name: "Requisitos padrão",
+    targetDocument: "1_Requisitos.md",
+    contentMd: "# Requisitos\n## RF\n## RNF",
+  },
+  {
+    id: "t2",
+    name: "Arquitetura limpa",
+    targetDocument: "4_Arquitetura.md",
+    contentMd: "# Arquitetura\n## Camadas",
+  },
+  {
+    id: "t3",
+    name: "UML Mermaid",
+    targetDocument: "5_UML.md",
+    contentMd: "# UML\n```mermaid\n```",
+  },
+  { id: "t4", name: "API Spec", targetDocument: "6_API_Spec.md", contentMd: "# API Spec" },
 ];
 
 export const mockConstraints: Constraint[] = [

@@ -1,4 +1,10 @@
-export type ArtifactType = "REQUIREMENTS" | "ARCHITECTURE" | "UML" | "AGENTS_MD";
+export type ArtifactType =
+  | "API_SPEC"
+  | "ARCHITECTURE_DOC"
+  | "DOMAIN_MODEL"
+  | "REQUIREMENTS"
+  | "UML_DIAGRAM"
+  | "USER_STORIES";
 
 export const ARTIFACT_META: Record<
   ArtifactType,
@@ -10,31 +16,39 @@ export const ARTIFACT_META: Record<
     icon: "📋",
     description: "RF e RNF estruturados a partir do escopo aprovado.",
   },
-  ARCHITECTURE: {
+  USER_STORIES: {
+    label: "User stories",
+    file: "2_User_Stories.md",
+    icon: "👤",
+    description: "Histórias de usuário com critérios de aceite.",
+  },
+  DOMAIN_MODEL: {
+    label: "Modelo de domínio",
+    file: "3_Modelo_Dominio.md",
+    icon: "🧠",
+    description: "Entidades, agregados e relações centrais do domínio.",
+  },
+  ARCHITECTURE_DOC: {
     label: "Arquitetura",
-    file: "2_Arquitetura.md",
+    file: "4_Arquitetura.md",
     icon: "🏗️",
     description: "Documento arquitetural com camadas, decisões e trade-offs.",
   },
-  UML: {
+  UML_DIAGRAM: {
     label: "Diagramas UML",
-    file: "3_UML.md",
+    file: "5_UML.md",
     icon: "🧩",
     description: "Casos de uso, classes e fluxo em sintaxe Mermaid.",
   },
-  AGENTS_MD: {
-    label: "agents.md",
-    file: "agents.md",
-    icon: "⚙️",
-    description: "Configuração de agentes derivada da arquitetura.",
+  API_SPEC: {
+    label: "API Spec",
+    file: "6_API_Spec.md",
+    icon: "🔌",
+    description: "Contrato de API com endpoints, payloads e respostas esperadas.",
   },
 };
 
-export type ProjectStatus =
-  | "AWAITING_SCOPE"
-  | "GENERATING"
-  | "COMPLETED"
-  | "FAILED";
+export type ProjectStatus = "AWAITING_SCOPE" | "GENERATING" | "COMPLETED" | "FAILED";
 
 export type ScopeStatus = "PENDING" | "APPROVED" | "REJECTED";
 

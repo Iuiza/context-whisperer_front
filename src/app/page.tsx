@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArtifactToolbar } from "@/components/artifact-toolbar";
 import { useProjectsStore } from "@/stores/projects-store";
+import { createProjectOnBackend } from "@/lib/graphql-client";
 import type { ArtifactType } from "@/lib/types";
 
 const SUGGESTIONS = [
@@ -22,23 +23,43 @@ export default function NewProjectPage() {
   const createProject = useProjectsStore((s) => s.createProject);
   const [name, setName] = useState("");
   const [prompt, setPrompt] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<ArtifactType[]>([
     "REQUIREMENTS",
-    "ARCHITECTURE",
-    "UML",
-    "AGENTS_MD",
+    "USER_STORIES",
+    "ARCHITECTURE_DOC",
+    "UML_DIAGRAM",
   ]);
 
-  const canSubmit = name.trim().length > 0 && prompt.trim().length > 0 && selected.length > 0;
+  const canSubmit =
+    name.trim().length > 0 && prompt.trim().length > 0 && selected.length > 0 && !isSubmitting;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return;
-    const p = createProject({
+
+    const input = {
       name: name.trim(),
       prompt: prompt.trim(),
-      selectedArtifacts: selected,
-    });
-    router.push(`/projects/${p.id}/scope`);
+      artifacts: selected,
+    };
+
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const projectId = await createProjectOnBackend(input);
+      const project = createProject({
+        id: projectId,
+        name: input.name,
+        prompt: input.prompt,
+        selectedArtifacts: input.artifacts,
+      });
+      router.push(`/projects/${project.id}/scope`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível criar o projeto.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -98,12 +119,27 @@ export default function NewProjectPage() {
             </div>
           </div>
 
-          <ArtifactToolbar value={selected} onChange={setSelected} />
+          <ArtifactToolbar value={selected} onChange={setSelected} disabled={isSubmitting} />
+
+          {error && (
+            <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+              {error}
+            </div>
+          )}
 
           <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
             <Button size="lg" disabled={!canSubmit} onClick={handleSubmit} className="gap-2">
-              Gerar proposta de escopo
-              <ArrowRight className="h-4 w-4" />
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Criando no backend...
+                </>
+              ) : (
+                <>
+                  Gerar proposta de escopo
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
             </Button>
           </div>
         </CardContent>
