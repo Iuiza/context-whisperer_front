@@ -1,5 +1,5 @@
+"use client";
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,14 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { mockConstraints, mockTemplates } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/templates")({
-  head: () => ({
-    meta: [{ title: "Templates & Constraints — Context Whisperer" }],
-  }),
-  component: TemplatesPage,
-});
-
-function TemplatesPage() {
+export default function TemplatesPage() {
   const [constraints, setConstraints] = useState(mockConstraints);
 
   return (
@@ -98,9 +91,7 @@ function TemplatesPage() {
                           {c.category}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-medium">
-                        {c.ruleDescription}
-                      </TableCell>
+                      <TableCell className="font-medium">{c.ruleDescription}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {c.ruleContent}
                       </TableCell>
@@ -109,9 +100,7 @@ function TemplatesPage() {
                           checked={c.isActive}
                           onCheckedChange={(v) =>
                             setConstraints((prev) =>
-                              prev.map((x) =>
-                                x.id === c.id ? { ...x, isActive: v } : x,
-                              ),
+                              prev.map((x) => (x.id === c.id ? { ...x, isActive: v } : x)),
                             )
                           }
                         />

@@ -1,5 +1,6 @@
+"use client";
 import { useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useRouter } from "next/navigation";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,27 +11,14 @@ import { ArtifactToolbar } from "@/components/artifact-toolbar";
 import { useProjectsStore } from "@/stores/projects-store";
 import type { ArtifactType } from "@/lib/types";
 
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Novo projeto — Context Whisperer" },
-      {
-        name: "description",
-        content: "Inicie uma nova requisição descrevendo seu MVP.",
-      },
-    ],
-  }),
-  component: NewProjectPage,
-});
-
 const SUGGESTIONS = [
   "App de delivery local com pagamento PIX e rastreio em tempo real",
   "SaaS de agendamento para clínicas pequenas com lembretes via WhatsApp",
   "Marketplace de cursos em vídeo com repasse automático para instrutores",
 ];
 
-function NewProjectPage() {
-  const navigate = useNavigate();
+export default function NewProjectPage() {
+  const router = useRouter();
   const createProject = useProjectsStore((s) => s.createProject);
   const [name, setName] = useState("");
   const [prompt, setPrompt] = useState("");
@@ -41,8 +29,7 @@ function NewProjectPage() {
     "AGENTS_MD",
   ]);
 
-  const canSubmit =
-    name.trim().length > 0 && prompt.trim().length > 0 && selected.length > 0;
+  const canSubmit = name.trim().length > 0 && prompt.trim().length > 0 && selected.length > 0;
 
   const handleSubmit = () => {
     if (!canSubmit) return;
@@ -51,7 +38,7 @@ function NewProjectPage() {
       prompt: prompt.trim(),
       selectedArtifacts: selected,
     });
-    navigate({ to: "/projects/$id/scope", params: { id: p.id } });
+    router.push(`/projects/${p.id}/scope`);
   };
 
   return (
@@ -60,13 +47,10 @@ function NewProjectPage() {
         <Badge variant="secondary" className="gap-1">
           <Sparkles className="h-3 w-3" /> Nova requisição
         </Badge>
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Descreva seu MVP
-        </h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Descreva seu MVP</h1>
         <p className="text-sm text-muted-foreground">
-          O Context Whisperer vai gerar uma proposta de escopo, distribuir
-          tarefas para agentes especialistas e auditar cada artefato com um
-          juiz restritivo.
+          O Context Whisperer vai gerar uma proposta de escopo, distribuir tarefas para agentes
+          especialistas e auditar cada artefato com um juiz restritivo.
         </p>
       </div>
 
@@ -117,12 +101,7 @@ function NewProjectPage() {
           <ArtifactToolbar value={selected} onChange={setSelected} />
 
           <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
-            <Button
-              size="lg"
-              disabled={!canSubmit}
-              onClick={handleSubmit}
-              className="gap-2"
-            >
+            <Button size="lg" disabled={!canSubmit} onClick={handleSubmit} className="gap-2">
               Gerar proposta de escopo
               <ArrowRight className="h-4 w-4" />
             </Button>

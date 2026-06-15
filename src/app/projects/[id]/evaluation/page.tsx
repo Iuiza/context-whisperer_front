@@ -1,5 +1,7 @@
+"use client";
+
+import { notFound, useParams } from "next/navigation";
 import { useMemo, useState } from "react";
-import { createFileRoute, notFound } from "@tanstack/react-router";
 import { Check, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -11,11 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -27,26 +25,20 @@ import {
 import { useProjectsStore } from "@/stores/projects-store";
 import { ARTIFACT_META, type ArtifactType } from "@/lib/types";
 
-export const Route = createFileRoute("/projects/$id/evaluation")({
-  component: EvaluationPage,
-});
-
-function EvaluationPage() {
-  const { id } = Route.useParams();
+export default function EvaluationPage() {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
   const project = useProjectsStore((s) => s.getProject(id));
   const [artifactFilter, setArtifactFilter] = useState<string>("ALL");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [openId, setOpenId] = useState<string | null>(null);
 
-  if (!project) throw notFound();
+  if (!project) notFound();
 
   const logs = useMemo(
     () =>
       project.evaluations.filter((e) => {
-        if (
-          artifactFilter !== "ALL" &&
-          e.artifactType !== (artifactFilter as ArtifactType)
-        )
+        if (artifactFilter !== "ALL" && e.artifactType !== (artifactFilter as ArtifactType))
           return false;
         if (statusFilter === "APPROVED" && !e.isApproved) return false;
         if (statusFilter === "REJECTED" && e.isApproved) return false;
@@ -68,10 +60,7 @@ function EvaluationPage() {
               {approvedCount} de {totalCount} artefatos aprovados
             </div>
           </div>
-          <Badge
-            variant="outline"
-            className="border-primary/40 text-primary"
-          >
+          <Badge variant="outline" className="border-primary/40 text-primary">
             {project.evaluations.length} avaliações registradas
           </Badge>
         </CardContent>
@@ -114,8 +103,7 @@ function EvaluationPage() {
         <CardContent>
           {logs.length === 0 ? (
             <div className="rounded-md border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              Nenhuma avaliação ainda. Avance a orquestração para gerar artefatos
-              e acionar o Juiz.
+              Nenhuma avaliação ainda. Avance a orquestração para gerar artefatos e acionar o Juiz.
             </div>
           ) : (
             <Table>

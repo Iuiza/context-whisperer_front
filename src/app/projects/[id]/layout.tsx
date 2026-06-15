@@ -1,25 +1,13 @@
-import {
-  createFileRoute,
-  Link,
-  Outlet,
-  useRouterState,
-  notFound,
-} from "@tanstack/react-router";
+"use client";
+
+import Link from "next/link";
+import { notFound, useParams, usePathname } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/status-badge";
 import { useProjectsStore } from "@/stores/projects-store";
 import { ARTIFACT_META } from "@/lib/types";
-
-export const Route = createFileRoute("/projects/$id")({
-  component: ProjectLayout,
-  notFoundComponent: () => (
-    <div className="p-10 text-center text-muted-foreground">
-      Projeto não encontrado.
-    </div>
-  ),
-});
 
 const STEPS = [
   { to: "scope", label: "Escopo (HITL)" },
@@ -28,12 +16,12 @@ const STEPS = [
   { to: "artifacts", label: "Artefatos" },
 ] as const;
 
-function ProjectLayout() {
-  const { id } = Route.useParams();
-  const project = useProjectsStore((s) => s.getProject(id));
-  const pathname = useRouterState({ select: (r) => r.location.pathname });
+export default function ProjectLayout({ children }: { children: React.ReactNode }) {
+  const params = useParams<{ id: string }>();
+  const project = useProjectsStore((s) => s.getProject(params.id));
+  const pathname = usePathname();
 
-  if (!project) throw notFound();
+  if (!project) notFound();
 
   return (
     <div className="flex flex-col">
@@ -47,13 +35,11 @@ function ProjectLayout() {
                 size="sm"
                 className="-ml-2 h-7 gap-1 text-xs text-muted-foreground"
               >
-                <Link to="/">
+                <Link href="/">
                   <ChevronLeft className="h-3 w-3" /> Novo projeto
                 </Link>
               </Button>
-              <h1 className="text-2xl font-semibold tracking-tight">
-                {project.name}
-              </h1>
+              <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
               <p className="line-clamp-2 max-w-2xl text-sm text-muted-foreground">
                 {project.prompt}
               </p>
@@ -77,8 +63,7 @@ function ProjectLayout() {
               return (
                 <Link
                   key={s.to}
-                  to={"/projects/$id/" + s.to as "/projects/$id/scope"}
-                  params={{ id: project.id }}
+                  href={href}
                   className={
                     "border-b-2 px-3 py-2 text-sm transition-colors " +
                     (active
@@ -93,9 +78,7 @@ function ProjectLayout() {
           </nav>
         </div>
       </div>
-      <div className="mx-auto w-full max-w-6xl px-4 py-6">
-        <Outlet />
-      </div>
+      <div className="mx-auto w-full max-w-6xl px-4 py-6">{children}</div>
     </div>
   );
 }
