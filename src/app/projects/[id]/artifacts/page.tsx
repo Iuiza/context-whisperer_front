@@ -1,30 +1,24 @@
+"use client";
+
+import { notFound, useParams } from "next/navigation";
 import { useState } from "react";
-import { createFileRoute, notFound } from "@tanstack/react-router";
 import { Download, Eye, Package } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { StatusBadge } from "@/components/status-badge";
 import { MarkdownView } from "@/components/markdown-view";
 import { useProjectsStore } from "@/stores/projects-store";
 import { ARTIFACT_META, type ArtifactType } from "@/lib/types";
 
-export const Route = createFileRoute("/projects/$id/artifacts")({
-  component: ArtifactsPage,
-});
-
-function ArtifactsPage() {
-  const { id } = Route.useParams();
+export default function ArtifactsPage() {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
   const project = useProjectsStore((s) => s.getProject(id));
   const [open, setOpen] = useState<ArtifactType | null>(null);
 
-  if (!project) throw notFound();
+  if (!project) notFound();
 
   const items = project.selectedArtifacts.map((t) => {
     const a = project.artifacts.find((x) => x.type === t);
@@ -76,9 +70,7 @@ function ArtifactsPage() {
                 </CardTitle>
                 <StatusBadge status={it.status} />
               </div>
-              <p className="font-mono text-xs text-muted-foreground">
-                {it.meta.file}
-              </p>
+              <p className="font-mono text-xs text-muted-foreground">{it.meta.file}</p>
             </CardHeader>
             <CardContent className="space-y-3">
               <Badge variant="secondary" className="text-[10px]">
@@ -111,9 +103,7 @@ function ArtifactsPage() {
       <Dialog open={!!open} onOpenChange={(o) => !o && setOpen(null)}>
         <DialogContent className="max-h-[80vh] max-w-3xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-mono text-sm">
-              {openItem?.meta.file}
-            </DialogTitle>
+            <DialogTitle className="font-mono text-sm">{openItem?.meta.file}</DialogTitle>
           </DialogHeader>
           {openItem && (
             <div className="rounded-md border border-border bg-muted/30 p-4">

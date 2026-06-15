@@ -1,5 +1,6 @@
+"use client";
 import { useState } from "react";
-import { createFileRoute, useNavigate, notFound } from "@tanstack/react-router";
+import { notFound, useParams, useRouter } from "next/navigation";
 import { Check, X, MessageSquareWarning } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,26 +9,20 @@ import { MarkdownView } from "@/components/markdown-view";
 import { StatusBadge } from "@/components/status-badge";
 import { useProjectsStore } from "@/stores/projects-store";
 
-export const Route = createFileRoute("/projects/$id/scope")({
-  component: ScopePage,
-});
-
-function ScopePage() {
-  const { id } = Route.useParams();
-  const navigate = useNavigate();
+export default function ScopePage() {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
+  const router = useRouter();
   const project = useProjectsStore((s) => s.getProject(id));
   const setScopeStatus = useProjectsStore((s) => s.setScopeStatus);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedback, setFeedback] = useState("");
 
-  if (!project) throw notFound();
+  if (!project) notFound();
 
   const approve = () => {
     setScopeStatus(project.id, "APPROVED");
-    navigate({
-      to: "/projects/$id/orchestration",
-      params: { id: project.id },
-    });
+    router.push(`/projects/${project.id}/orchestration`);
   };
 
   return (
@@ -47,9 +42,7 @@ function ScopePage() {
         <CardHeader className="flex-row items-center justify-between">
           <div>
             <CardTitle className="text-base">Proposta de escopo</CardTitle>
-            <p className="text-xs text-muted-foreground">
-              Validação Human-in-the-Loop (RF03)
-            </p>
+            <p className="text-xs text-muted-foreground">Validação Human-in-the-Loop (RF03)</p>
           </div>
           <StatusBadge status={project.scope.status} />
         </CardHeader>
@@ -69,9 +62,7 @@ function ScopePage() {
 
           {showFeedback && (
             <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Solicitar ajustes na proposta
-              </label>
+              <label className="text-sm font-medium">Solicitar ajustes na proposta</label>
               <Textarea
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
@@ -106,11 +97,7 @@ function ScopePage() {
               >
                 <X className="h-4 w-4" /> Rejeitar
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowFeedback(true)}
-                className="gap-2"
-              >
+              <Button variant="outline" onClick={() => setShowFeedback(true)} className="gap-2">
                 <MessageSquareWarning className="h-4 w-4" /> Solicitar ajustes
               </Button>
               <Button onClick={approve} className="gap-2">
