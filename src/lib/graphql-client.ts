@@ -1,7 +1,7 @@
 import type { AgentEvent, ArtifactType } from "@/lib/types";
 import { createClient } from "graphql-ws";
 
-const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_URL ?? "http://localhost:3000/api/graphql";
+const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_URL ?? "https://context-whisperer-production.up.railway.app/api/graphql";
 const WS_GRAPHQL_ENDPOINT = GRAPHQL_ENDPOINT.replace(/^http/, "ws");
 const ACCESS_TOKEN_KEY = "context-whisperer:access-token";
 
