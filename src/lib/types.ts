@@ -54,6 +54,11 @@ export type ScopeStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export type ArtifactStatus = "DRAFT" | "RUNNING" | "APPROVED" | "REJECTED" | "IDLE";
 
+export interface AgentEvent {
+  id: string;
+  contentMd: string;
+}
+
 export interface Artifact {
   type: ArtifactType;
   status: ArtifactStatus;

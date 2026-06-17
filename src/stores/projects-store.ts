@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { mockProjects, newProjectScopeMd } from "@/lib/mock-data";
 import type { Artifact, ArtifactType, Project, ProjectStatus, ScopeStatus } from "@/lib/types";
+import { initAgentEventsSubscription } from "./agent-events-store";
+import { createProjectOnBackend } from "@/lib/graphql-client";
 
 interface CreateProjectInput {
   name: string;
@@ -11,8 +13,9 @@ interface CreateProjectInput {
 
 interface ProjectsState {
   projects: Project[];
-  createProject: (input: CreateProjectInput) => Project;
+  createProject: (input: CreateProjectInput) => Promise<Project>;
   getProject: (id: string) => Project | undefined;
+  updateProjectScope: (id: string, contentMd: string) => void;
   setScopeStatus: (id: string, status: ScopeStatus, feedback?: string) => void;
   setProjectStatus: (id: string, status: ProjectStatus) => void;
   advanceSimulation: (id: string) => void;
@@ -40,23 +43,49 @@ const draftFor = (type: ArtifactType) =>
 
 export const useProjectsStore = create<ProjectsState>((set, get) => ({
   projects: mockProjects,
-  createProject: ({ id: providedId, name, prompt, selectedArtifacts }) => {
-    const id = providedId ?? `proj-${Date.now()}`;
+  createProject: async ({ id: providedId, name, prompt, selectedArtifacts }) => {
+    // 1. Initialize Subscription FIRST
+    initAgentEventsSubscription();
+
+    let projectId = null;
+    // 2. Call Backend
+    try {
+      projectId = await createProjectOnBackend({
+        name,
+        prompt,
+        artifacts: selectedArtifacts,
+      });
+    } catch (error) {
+      console.error("Failed to create project on backend:", error);
+      throw error;
+    }
+
+    const id = projectId ?? providedId ?? `proj-${Date.now()}`;
     const project: Project = {
       id,
       name,
       prompt,
       status: "AWAITING_SCOPE",
       selectedArtifacts,
-      scope: { status: "PENDING", contentMd: newProjectScopeMd(prompt) },
+      scope: {
+        status: "PENDING",
+        contentMd: newProjectScopeMd(prompt),
+      },
       artifacts: [],
       evaluations: [],
       createdAt: new Date().toISOString(),
     };
+
     set((s) => ({ projects: [project, ...s.projects] }));
     return project;
   },
   getProject: (id) => get().projects.find((p) => p.id === id),
+  updateProjectScope: (id, contentMd) =>
+    set((s) => ({
+      projects: s.projects.map((p) =>
+        p.id === id ? { ...p, scope: { ...p.scope, contentMd } } : p,
+      ),
+    })),
   setScopeStatus: (id, status, feedback) =>
     set((s) => ({
       projects: s.projects.map((p) =>

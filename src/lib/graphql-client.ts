@@ -1,6 +1,8 @@
-import type { ArtifactType } from "@/lib/types";
+import type { AgentEvent, ArtifactType } from "@/lib/types";
+import { createClient } from "graphql-ws";
 
-const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_URL ?? "/api/graphql";
+const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_URL ?? "http://localhost:3000/api/graphql";
+const WS_GRAPHQL_ENDPOINT = GRAPHQL_ENDPOINT.replace(/^http/, "ws");
 const ACCESS_TOKEN_KEY = "context-whisperer:access-token";
 
 interface GraphQLResponse<T> {
@@ -22,8 +24,7 @@ export interface AuthResponse {
 }
 
 function getAccessToken() {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(ACCESS_TOKEN_KEY);
+  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imx1aXphMUBleGFtcGxlLmNvbSIsInN1YiI6ImU1MjRlZmQ3LThiZWUtNGVhYS04ZTkxLTA2YzNkNzU5MmFmMyIsImlhdCI6MTc4MTEzNDM3NSwiZXhwIjoxNzgxNzM5MTc1fQ.VTjKBiQFsJiLTkgDeSlhIO758LDWpGvJh1pfc3999bI";
 }
 
 export function setAccessToken(token: string) {
@@ -34,6 +35,43 @@ export function setAccessToken(token: string) {
 export function clearAccessToken() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(ACCESS_TOKEN_KEY);
+}
+
+const wsClient =
+  typeof window !== "undefined"
+    ? createClient({
+        url: WS_GRAPHQL_ENDPOINT,
+        connectionParams: () => {
+          const token = getAccessToken();
+          return token ? { authorization: `Bearer ${token}` } : {};
+        },
+      })
+    : null;
+
+export function subscribeToAgentEvents(userId: string, onEvent: (event: AgentEvent) => void) {
+  if (!wsClient) return () => {};
+
+  return wsClient.subscribe(
+    {
+      query: `
+        subscription OnAgentEvents($userId: String!) {
+          agentEvents(userId: $userId) {
+            id
+            contentMd
+          }
+        }
+      `,
+      variables: { userId },
+    },
+    {
+      next: (data) => {
+        const event = (data.data as { agentEvents: AgentEvent }).agentEvents;
+        onEvent(event);
+      },
+      error: (err) => console.error("Subscription error:", err),
+      complete: () => console.log("Subscription complete"),
+    },
+  );
 }
 
 async function graphqlRequest<

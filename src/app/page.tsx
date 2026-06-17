@@ -41,19 +41,13 @@ export default function NewProjectPage() {
     const input = {
       name: name.trim(),
       prompt: prompt.trim(),
-      artifacts: selected,
+      selectedArtifacts: selected,
     };
 
     setIsSubmitting(true);
     setError(null);
     try {
-      const projectId = await createProjectOnBackend(input);
-      const project = createProject({
-        id: projectId,
-        name: input.name,
-        prompt: input.prompt,
-        selectedArtifacts: input.artifacts,
-      });
+      const project = await createProject(input);
       router.push(`/projects/${project.id}/scope`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Não foi possível criar o projeto.");
