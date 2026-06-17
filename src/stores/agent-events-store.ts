@@ -20,7 +20,7 @@ export const useAgentEventsStore = create<AgentEventsState>((set) => ({
   setUnsubscribe: (fn) => set({ unsubscribe: fn }),
 }));
 
-const MOCKED_USER_ID = "e524efd7-8bee-4eaa-8e91-06c3d7592af3";
+const MOCKED_USER_ID = "af5ac219-a1d8-43b7-b49a-1e34818affbf";
 
 export function initAgentEventsSubscription() {
   if (typeof window === "undefined") return () => {};

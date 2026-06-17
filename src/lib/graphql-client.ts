@@ -24,7 +24,7 @@ export interface AuthResponse {
 }
 
 function getAccessToken() {
-  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imx1aXphMUBleGFtcGxlLmNvbSIsInN1YiI6ImU1MjRlZmQ3LThiZWUtNGVhYS04ZTkxLTA2YzNkNzU5MmFmMyIsImlhdCI6MTc4MTEzNDM3NSwiZXhwIjoxNzgxNzM5MTc1fQ.VTjKBiQFsJiLTkgDeSlhIO758LDWpGvJh1pfc3999bI";
+  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imx1aXphMTZAZXhhbXBsZS5jb20iLCJzdWIiOiJhZjVhYzIxOS1hMWQ4LTQzYjctYjQ5YS0xZTM0ODE4YWZmYmYiLCJpYXQiOjE3ODE2NjE3OTIsImV4cCI6MTc4MjI2NjU5Mn0.pTiLvK1mazknlc2HsB6SV8P6GL5exLI5wt8ifcyE240";
 }
 
 export function setAccessToken(token: string) {
